@@ -1,0 +1,108 @@
+  // This is your Prisma schema file,
+  // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+  // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+  // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+  generator client {
+    provider = "prisma-client-js"
+  }
+
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+  }
+model Book {
+    id          Int      @id @default(autoincrement())
+    title       String
+    authorId    Int
+    author      Author   @relation(fields: [authorId], references: [id])
+    reviews     Review[]
+    blogposts   BlogPost[]
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    coverImageUrl String?
+    quotes        Quote[]
+    bookThoughtBubbles BookThoughtBubble[]
+
+    @@index([title])
+    @@index([authorId])
+    @@index([coverImageUrl])
+}
+
+model Review {
+    id        Int      @id @default(autoincrement())
+    bookId    Int
+    book      Book     @relation(fields: [bookId], references: [id])
+    content   String
+    score     Int?
+    reviewer  String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([bookId])
+}
+
+model BlogPost {
+    id          Int      @id @default(autoincrement())
+    title       String
+    content     String
+    bookId      Int?
+    book        Book?    @relation(fields: [bookId], references: [id])
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    blogPostThoughtBubbles BlogPostThoughtBubble[]
+
+    @@index([title])
+    @@index([bookId])
+}
+
+model Author {
+    id Int @id @default(autoincrement())
+    name String
+    books Book[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    imageUrl  String?
+     @@index([name])
+}
+
+model User {
+    id       Int    @id @default(autoincrement())
+    username String @unique
+    password String
+    isAdmin  Boolean @default(false)
+}
+
+model Quote {
+    id        Int      @id @default(autoincrement())
+    bookId    Int
+    book      Book     @relation(fields: [bookId], references: [id])
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([bookId])
+}
+
+model BookThoughtBubble {
+    id        Int      @id @default(autoincrement())
+    bookId    Int
+    book      Book     @relation(fields: [bookId], references: [id])
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([bookId])
+}
+
+model BlogPostThoughtBubble {
+    id        Int      @id @default(autoincrement())
+    blogPostId Int
+    blogPost BlogPost @relation(fields: [blogPostId], references: [id])
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([blogPostId])
+}
